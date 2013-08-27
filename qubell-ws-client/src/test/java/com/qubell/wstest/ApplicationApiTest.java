@@ -59,8 +59,7 @@ public class ApplicationApiTest
         customStuff.put("secondLevel", secondLevel);
         customStuff.put("firstLevel", "test");
 
-        //instanceSpecification.setCustomParameters(customStuff);
-        //instanceSpecification.addParameters(customStuff);
+        instanceSpecification.setParameters(customStuff);
 
 
         Instance i = api.launchInstanceByAppId("5200df12e4b0758c3d25e2af", instanceSpecification);

@@ -331,4 +331,18 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     protected MavenProject getProject() {
         return project;
     }
+
+    /**
+     * Parses custom parameters field into map of string to object.
+     *
+     * @return parsed map or empty map
+     */
+    protected Map<String, Object> parseCustomParameters() {
+        Map<String, Object> customParams = JsonParser.parseMap(parameters);
+        if (customParams == null) {
+            getLog().warn("Unable to parse custom parameters, ignoring. Values was:" + parameters);
+            customParams = new HashMap<String, Object>();
+        }
+        return customParams;
+    }
 }

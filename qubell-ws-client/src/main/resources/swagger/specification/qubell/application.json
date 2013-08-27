@@ -132,6 +132,10 @@
                 "instanceName": {
                     "type": "string",
                     "description": "name of the new instance, will be generated if not specified"
+                },
+                "parameters": {
+                    "type": "Object",
+                    "description": "Custom instance launch parameters map"
                 }
             }
         },

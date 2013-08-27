@@ -16,7 +16,6 @@
 
 package com.qubell.maven.plugin;
 
-import com.qubell.client.JsonParser;
 import com.qubell.client.exceptions.QubellServiceException;
 import com.qubell.client.ws.model.Instance;
 import org.apache.commons.lang.StringUtils;
@@ -25,7 +24,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -86,11 +84,7 @@ public class RunCommandMojo extends AbstractQubellMojo {
         logMessage("Running command %s on instance %s", getCommandName(), targetInstanceId);
 
 
-        Map<String, Object> customParams = JsonParser.parseMap(parameters);
-        if (customParams == null) {
-            getLog().warn("Unable to parse custom parameters, ignoring. Values was:" + parameters);
-            customParams = new HashMap<String, Object>();
-        }
+        Map<String, Object> customParams = parseCustomParameters();
 
         try {
             Instance i = getInstancesApi().runWorkflow(targetInstanceId, getCommandName(), customParams);

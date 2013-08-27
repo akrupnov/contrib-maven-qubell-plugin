@@ -23,6 +23,7 @@ import com.qubell.client.ws.model.InstanceSpecification;
 import com.qubell.client.ws.model.InstanceStatus;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class InstanceApiTest
         extends BaseServiceTest {
@@ -35,8 +36,15 @@ public class InstanceApiTest
         instanceSpecification.setDestroyInterval(new Long(1000000));
         instanceSpecification.setInstanceName("InstanceApiTest.testInstanceStatusGet");
 
-        //instanceSpecification.setCustomParameters(customStuff);
-        //instanceSpecification.addParameters(customStuff);
+        Map<String, Object> customStuff = new HashMap<String, Object>();
+        Map<String, Object> secondLevel = new HashMap<String, Object>();
+        secondLevel.put("sample", 2);
+
+        customStuff.put("secondLevel", secondLevel);
+        customStuff.put("customInstanceLaunch", "test");
+        customStuff.put("customInstanceLaunchStrikesBack", "test2");
+
+        instanceSpecification.setParameters(customStuff);
 
 
         Instance instance = appApi.launchInstanceByAppId("5200df12e4b0758c3d25e2af", instanceSpecification);
@@ -45,6 +53,7 @@ public class InstanceApiTest
         InstancesApi api = new InstancesApi(getTestConfiguration());
         HashMap<String, Object> custom = new HashMap<String, Object>();
         custom.put("someMoreParams", "its value");
+        Thread.sleep(2000);
 
         instance = api.runWorkflow(instance.getId(), "returnstuff", custom);
         Thread.sleep(2000);
