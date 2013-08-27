@@ -1,0 +1,195 @@
+  ------
+  Usage
+  ------
+  Alex Krupnov <akrupnov@gmail.com>
+  ------
+  2013-08-25
+  ------
+
+~~ Licensed to the Apache Software Foundation (ASF) under one
+~~ or more contributor license agreements.  See the NOTICE file
+~~ distributed with this work for additional information
+~~ regarding copyright ownership.  The ASF licenses this file
+~~ to you under the Apache License, Version 2.0 (the
+~~ "License"); you may not use this file except in compliance
+~~ with the License.  You may obtain a copy of the License at
+~~
+~~   http://www.apache.org/licenses/LICENSE-2.0
+~~
+~~ Unless required by applicable law or agreed to in writing,
+~~ software distributed under the License is distributed on an
+~~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+~~ KIND, either express or implied.  See the License for the
+~~ specific language governing permissions and limitations
+~~ under the License.
+
+Usage
+
+* Prepare your project to use the qubell-maven-plugin
+
+  Add the following code to <<build>> section of your pom file
+
++--------
+
+<project>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.qubell.maven</groupId>
+        <artifactId>qubell-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <!-- For configuration settings description see goals help page --->
+          <bypassSSLCheck>true</bypassSSLCheck>
+          <apiUsername>username</apiUsername>
+          <apiPassword>password</apiPassword>
+          <apiURL>https://express.qubell.com/</apiURL>
+
+          <statusPollingInterval>10</statusPollingInterval>
+          <statusWaitTimeout>60</statusWaitTimeout>
+          <logApiPayload>false</logApiPayload>
+         </configuration>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
+
++-------
+
+* Configure plugin execution as part of lifecycle
+
+ You can configure plugin goals execution to be part of your Maven project lifecycle.
+ Please see example below
+
++------
+<project>
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>qubell-maven-plugin</artifactId>
+        ...
+        <configuration>
+          ...<!-- Shared config settings -->
+         </configuration>
+        <executions>
+          <execution><!-- Maven run executions in a natural order -->
+            <id>launch</id>
+            <phase>install</phase>
+            <goals>
+              <goal>launch-instance</goal>
+            </goals>
+            <configuration>
+              <!-- Overriden global config value -->
+              <statusPollingInterval>5</statusPollingInterval>
+              <applicationId>5200df12e4b0758c3d25e2af</applicationId>
+              <environmentId>5200ddb8e4b0758c3d25e295</environmentId>
+              <parameters>
+                  {
+                    "some" : "Param"
+                  }
+              </parameters>
+              <manifestRelativePath>./samplerepo/manifest.yaml</manifestRelativePath>
+              <outputRelativePath>./path.json</outputRelativePath>
+              <destroyInterval>900000</destroyInterval>
+            </configuration>
+          </execution>
+          <execution>
+            <id>returnstuff</id>
+            <phase>install</phase>
+            <goals>
+              <goal>run-command</goal>
+            </goals>
+            <configuration>
+              <name>returnstuff</name>
+              <parameters>
+                  {
+                    "somekey" : "true"
+                  }
+              </parameters>
+              <outputRelativePath>./returnstuff.json</outputRelativePath>
+            </configuration>
+          </execution>
+          <execution>
+            <id>destroy</id>
+            <phase>install</phase>
+            <goals>
+              <goal>destroy-instance</goal>
+            </goals>
+            <configuration>
+              <parameters>
+                  {
+                    "some" : "Param"
+                  }
+              </parameters>
+              <statusPollingInterval>15</statusPollingInterval>
+              <outputRelativePath>./destroy.json</outputRelativePath>
+            </configuration>
+          </execution>
+        </executions>
+
+      </plugin>
+    </plugins>
+    ...
+  </build>
+  ...
+</project>
++------
+
+    When you run the regular install target, Qubell goals will be executed by Maven
+
++------
+mvn install
++------
+
+* Running in standalone mode
+
+    Qubell plugin goals can be executed manually when plugin is defined in your pom file
+
+
+   Launch instance of Application 5200ddb8e4b0758c3d25e294 when connection properties are stored in pom configuration
+
++------
+mvn qubell:launch-instance -DapplicationId=5200df12e4b0758c3d25e2af
++------
+
+    Launches instance of Application, supplying all parameters from command line
+
++------
+mvn qubell:launch-instance -DapplicationId=5200df12e4b0758c3d25e2af -DenvironmentId=5200ddb8e4b0758c3d25e295 -DapiURL=https://express.qubell.com/ -DapiUsername=user@name.com -DapiPassword=password -DbypassSSLCheck=true -DmanifestRelativePath=./sample/manifest.yaml -DoutputRelativePath=./out.json -DstatusPollingInterval=4 -DstatusWaitTimeout=90 -DdestroyInterval=900000 -Dparameters='{"some" : "Param"}'
++------
+
+    Runs instance workflow returnStuff on instance 5219de34e4b0bf0bfe18605f with custom parameters
+
++------
+mvn qubell:run-command -DinstanceId=5219de34e4b0bf0bfe18605f -Dname=returnstuff -Dparameters='{"some" : "Param"}' -DoutputRelativePath=./returnstuff.json
++------
+
+    Same as above, ignoring optional parameters
+
++------
+mvn qubell:run-command -DinstanceId=5219de34e4b0bf0bfe18605f -Dname=returnstuff
++------
+
+    Destroys instance 5219de34e4b0bf0bfe18605f
+
++------
+mvn qubell:destroy-instance -DinstanceId=5219de34e4b0bf0bfe18605f -DoutputRelativePath=./destroy.json
++------
+
+    Verifying connection settings. In order to check the connection you can call goal test-connection
+
++------
+mvn qubell:test-connection
++------
+
+    Debugging information: you can use -X option of maven to show plugin's debug inforamtion. For api payload logging add -DlogApiPayload=true
+    Example below destroys instance 5200df12e4b0758c3d25e2af with maximum logging in place
+
++------
+mvn qubell:destroy-instance -DinstanceId=5219cbf8e4b0bf0bfe186002 -DlogApiPayload=true
++------
+

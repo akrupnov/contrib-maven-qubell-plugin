@@ -1,0 +1,252 @@
+{
+    "apiVersion": "1.19",
+    "swaggerVersion": "1.2",
+    "basePath": "https://express.qubell.com/api/1",
+    "resourcePath": "/instances",
+    "apis": [
+        {
+            "path": "/instances/{instanceId}",
+            "description": "Retrieves the application instance status",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "summary": "Retrieves the application instance status.",
+                    "responseClass": "InstanceStatus",
+                    "nickname": "getInstanceStatusById",
+                    "parameters": [
+                        {
+                            "name": "instanceId",
+                            "description": "id of the instance",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to view the instance"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified instance doesn't exist"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/instances/{instanceId}/{workflow}",
+            "description": "Runs the specified application instance workflow",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "summary": "Runs the specified application instance workflow",
+                    "responseClass": "Instance",
+                    "nickname": "runWorkflow",
+                    "parameters": [
+                        {
+                            "name": "instanceId",
+                            "description": "id of the instance",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        },
+                        {
+                            "name": "workflow",
+                            "description": "name of the workflow to run",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        },
+                        {
+                            "name": "requestBody",
+                            "description": "Workflow parameters",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "Object"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "incorrect content type or json body is incorrect or requested version of the manifest is invalid"
+                        },
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to view the instance"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified instance doesn't exist"
+                        }
+                    ]
+                }
+            ]
+
+        }
+    ],
+    "models": {
+        "WorkflowParameters": {
+            "id": "WorkflowParameters",
+            "properties" : {
+                "test" : {
+                    "type" : "string",
+                    "description" : "temporary example property"
+                }
+            }
+        },
+        "InstanceStatus": {
+            "id": "InstanceStatus",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Requested instance id"
+                },
+                "version": {
+                    "type": "int",
+                    "format": "int32",
+                    "description": "Version of the application manifest used to launch this instance"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "Requested",
+                        "Executing",
+                        "Failed",
+                        "Running",
+                        "Canceled",
+                        "Suspended",
+                        "Destroyed"
+                    ],
+                    "description": "Current instance status, one of Requested, Executing, Failed, Running, Canceled, Suspended, Destroyed"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Requested instance name, as seen on the UI"
+                },
+                "parameters": {
+                    "type": "object",
+                    "description": "Instance parameters"
+                },
+                "ownerId": {
+                    "type": "string",
+                    "description": "Id of the user who has launched the instance"
+                },
+                "errorMessage": {
+                    "type": "string",
+                    "description": "If an error occured during last job execution, the error message will be in this field"
+                },
+                "applicationId": {
+                    "type": "string",
+                    "description": "Id of the application that the instance belongs to"
+                },
+                "environmentId": {
+                    "type": "string",
+                    "description": "Id of the environment used to launch this instance"
+                },
+                "returnValues": {
+                    "type": "object",
+                    "description": "Properties of the instance"
+                },
+                "workflow": {
+                    "type": "Workflow"
+                },
+                "workflowHistory": {
+                    "type": "Array",
+                    "items": {
+                        "$ref": "HistoricJob"
+                    }
+                }
+            }
+        },
+        "Workflow": {
+            "id": "Workflow",
+            "description": "The workflow object is optional and exists only of there is an executing workflow for the instance.",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the currently executing workflow"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "Requested",
+                        "Executing",
+                        "Failed",
+                        "Succeeded",
+                        "Canceled",
+                        "Suspended"
+                    ],
+                    "description": "Status of the currently executing workflow, one of Requested, Executing, Failed, Succeeded, Canceled, Suspended"
+                },
+                "ownerId": {
+                    "type": "string",
+                    "description": "Id of the user who has executed the workflow"
+                },
+                "steps": {
+                    "type": "Array",
+                    "items": {
+                        "$ref": "WorkflowStep"
+                    }
+                }
+            }
+        },
+        "WorkflowStep": {
+            "id": "WorkflowStep",
+            "description": "Step of Qubell instance workflow",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the currently executing step"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "Requested",
+                        "Executing",
+                        "Failed",
+                        "Succeeded"
+                    ],
+                    "description": "The status of the currently executing step, takes one of the following values: Requested, Executing, Failed, Succeeded"
+                },
+                "percentComplete": {
+                    "type": "int",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "The percent of completion of the executing step, 0 to 100"
+                }
+            }
+        },
+        "HistoricJob": {
+            "id": "HistoricJob",
+            "description": "Contains information about previously executed jobs",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of historic job"
+                },
+                "status": {
+                    "type": "string",
+                    "description": "Exit status of the historic job"
+                },
+                "ownerId": {
+                    "type": "string",
+                    "description": "Id of the user who has executed a corresponding job"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,148 @@
+{
+    "apiVersion": "1.19",
+    "swaggerVersion": "1.2",
+    "basePath": "https://express.qubell.com/api/1",
+    "resourcePath": "/applications",
+    "apis": [
+        {
+            "path": "/applications/{appId}/manifest",
+            "description": "Replaces a current application manifest with a new one but only if the former was uploaded from the form. Currently replacing manifests defined via HTTP URL is not supported",
+            "operations": [
+                {
+                    "httpMethod": "PUT",
+                    "summary": "Replaces a current application manifest with a new one but only if the former was uploaded from the form. Currently replacing manifests defined via HTTP URL is not supported",
+                    "nickname": "updateManifest",
+                    "responseClass": "Application",
+                    "supportedContentTypes": ["application/x-yaml"],
+                    "parameters": [
+                        {
+                            "name": "appId",
+                            "description": "id of the application",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        },
+                        {
+                            "name": "requestBody",
+                            "description": "Application YAML manifest",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "String"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Incorrect content type or json body is incorrect or requested version of the manifest is invalid"
+                        },
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to access the application"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified application doesn't exist"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/applications/{appId}/launch",
+            "description": "App launch",
+            "operations": [
+                {
+                    "httpMethod": "POST",
+                    "summary": "Launches the specified application",
+                    "responseClass": "Instance",
+                    "nickname": "launchInstanceByAppId",
+                    "parameters": [
+                        {
+                            "name": "appId",
+                            "description": "id of the application",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        },
+                        {
+                            "name": "requestBody",
+                            "description": "Instance launch specification",
+                            "paramType": "body",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "InstanceSpecification"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 400,
+                            "reason": "Incorrect content type or json body is incorrect or requested version of the manifest is invalid"
+                        },
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to access the application"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified application doesn't exist"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Application": {
+            "id": "Application",
+            "properties": {
+                "version": {
+                    "type": "int",
+                    "format": "int32",
+                    "description": "Version, assigned after manifest is updated"
+                }
+            }
+        },
+        "InstanceSpecification": {
+            "id": "InstanceSpecification",
+            "properties": {
+                "version": {
+                    "type": "int",
+                    "format": "int32",
+                    "description": "Application version to launch, if not specified, the most recent version is used"
+                },
+                "environmentId": {
+                    "type": "string",
+                    "description": "id of the environment to use"
+                },
+                "destroyInterval": {
+                    "type": "long",
+                    "description": "timeout before the instance is destroyed in ms, 60*60,000 (1 hour) if not specified, never if -1"
+                },
+                "instanceName": {
+                    "type": "string",
+                    "description": "name of the new instance, will be generated if not specified"
+                }
+            }
+        },
+        "Instance": {
+            "id": "Instance",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "required": false
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,54 @@
+package {{package}};
+
+{{#imports}}import {{import}};
+{{/imports}}
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+
+{{#models}}
+{{#model}}
+public class {{classname}} {
+  {{#vars}}
+
+  {{#description}}/* {{{description}}} */
+  {{/description}}
+  private {{{datatype}}} {{name}} = {{{defaultValue}}};
+  {{/vars}}
+
+
+  {{#vars}}
+
+  {{#description}}
+    /*
+    {{{description}}}
+    */
+  {{/description}}
+  public {{{datatype}}} {{getter}}() {
+    return {{name}};
+  }
+
+  public void {{setter}}({{{datatype}}} {{name}}) {
+    this.{{name}} = {{name}};
+    //{{baseName}}
+  }
+
+  {{/vars}}
+
+
+
+  @Override
+  public String toString()  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("class {{classname}} {\n");
+    {{#vars}}
+    sb.append("  {{name}}: ").append({{name}}).append("\n");
+    {{/vars}}
+    sb.append("}\n");
+    return sb.toString();
+  }
+}
+{{/model}}
+{{/models}}

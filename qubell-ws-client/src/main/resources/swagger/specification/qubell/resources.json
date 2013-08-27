@@ -1,0 +1,19 @@
+{
+    "apiVersion": "1.19",
+    "swaggerVersion": "1.2",
+    "basePath": "https://express.qubell.com/api/1",
+    "apis": [
+        {
+            "path": "/application.{format}",
+            "description": "Application operations"
+        },
+        {
+            "path": "/instance.{format}",
+            "description": "Instances operations"
+        },
+        {
+            "path": "/organization.{format}",
+            "description": "Organization operations"
+        }
+    ]
+}

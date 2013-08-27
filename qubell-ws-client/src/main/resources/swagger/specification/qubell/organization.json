@@ -1,0 +1,166 @@
+{
+    "apiVersion": "1.19",
+    "swaggerVersion": "1.2",
+    "basePath": "https://express.qubell.com/api/1",
+    "resourcePath": "/organizations",
+    "apis": [
+        {
+            "path": "/organizations",
+            "description": "Lists all organizations for given account",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "summary": "Lists all organizations for given account",
+                    "nickname": "listOrganizations",
+                    "responseClass": "List[Organization]"
+                }
+            ]
+        },
+        {
+            "path": "/organizations/{orgId}/environments",
+            "description": "Returns list of all environments in given organization",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "summary": "Returns list of all environmens in given organization",
+                    "nickname": "listEnvironmentsByOrganization",
+                    "responseClass": "List[Environment]",
+                    "parameters": [
+                        {
+                            "name": "orgId",
+                            "description": "id of the organization",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to access the environment"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified organization doesn't exist or the user is not authorized to access it"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "/organizations/{orgId}/applications",
+            "description": "Returns list of all applications in given organization",
+            "operations": [
+                {
+                    "httpMethod": "GET",
+                    "summary": "Returns list of all applications in given organization",
+                    "nickname": "listApplicationsByOrganization",
+                    "responseClass": "List[OrganizationApplication]",
+                    "parameters": [
+                        {
+                            "name": "orgId",
+                            "description": "id of the organization",
+                            "paramType": "path",
+                            "required": true,
+                            "allowMultiple": false,
+                            "dataType": "string"
+                        }
+                    ],
+                    "errorResponses": [
+                        {
+                            "code": 401,
+                            "reason": "The specified credentials are not valid"
+                        },
+                        {
+                            "code": 403,
+                            "reason": "User is not authorized to access the application"
+                        },
+                        {
+                            "code": 404,
+                            "reason": "Specified organization doesn't exist or the user is not authorized to access it"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "models": {
+        "Organization": {
+            "id": "Organization",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Id of the organization"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the organization"
+                }
+            }
+        },
+        "Environment": {
+            "id": "Environment",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Id of the environment"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Name of the environment"
+                },
+                "isDefault": {
+                    "type": "boolean",
+                    "description": "Whether environment is default"
+                }
+            }
+        },
+
+        "OrganizationApplication": {
+            "id": "OrganizationApplication",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Application id"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Application name"
+                },
+                "isBasicLaunchAllowed": {
+                    "type": "boolean",
+                    "description": "Whether basic launch is allowed for app"
+                },
+                "activeInstancesCount": {
+                    "type": "int",
+                    "format": "int32",
+                    "description": "Number of currently active instances"
+                },
+                "environments": {
+                    "type": "Array",
+                    "items": {
+                        "$ref": "Environment"
+                    }
+                },
+                "manifest": {
+                    "type": "Manifest",
+                    "description": "Application manifest"
+                }
+            }
+        },
+        "Manifest": {
+            "id": "Manifest",
+            "properties": {
+                "source": {
+                    "type": "string",
+                    "description": "Source of Manifest"
+                }
+            }
+        }
+    }
+}
