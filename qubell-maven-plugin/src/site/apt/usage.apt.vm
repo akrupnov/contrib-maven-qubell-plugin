@@ -25,6 +25,18 @@
 
 Usage
 
+* Install plugin to target computer
+
+  The recommended installation option is to have plugin installed to your repository storage and have it
+  configured either globally in maven settings.xml or in the pom file for your project.
+
+  Another option is to install plugin jar artifact into local repository manually.
+  To do so you need to call the following maven command
+
++--------
+mvn install:install-file -Dfile=${project.artifactId}-${project.version}.jar -Dversion=${project.version} -Dpackaging=jar -DgroupId=${project.groupId} -DartifactId=${project.artifactId}
++--------
+
 * Prepare your project to use the qubell-maven-plugin
 
   Add the following code to <<build>> section of your pom file
@@ -36,8 +48,8 @@ Usage
   <build>
     <plugins>
       <plugin>
-        <groupId>com.qubell.maven</groupId>
-        <artifactId>qubell-maven-plugin</artifactId>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>${project.artifactId}</artifactId>
         <version>${project.version}</version>
         <configuration>
           <!-- For configuration settings description see goals help page --->
