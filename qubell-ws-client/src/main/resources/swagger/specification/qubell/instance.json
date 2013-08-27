@@ -91,6 +91,10 @@
                         {
                             "code": 404,
                             "reason": "Specified instance doesn't exist"
+                        },
+                        {
+                            "code": 409,
+                            "reason": "Specified instance is executing another workflow currently"
                         }
                     ]
                 }
@@ -101,10 +105,10 @@
     "models": {
         "WorkflowParameters": {
             "id": "WorkflowParameters",
-            "properties" : {
-                "test" : {
-                    "type" : "string",
-                    "description" : "temporary example property"
+            "properties": {
+                "test": {
+                    "type": "string",
+                    "description": "temporary example property"
                 }
             }
         },
