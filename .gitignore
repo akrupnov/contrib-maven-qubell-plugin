@@ -47,3 +47,5 @@ target/
 .svn/
 
 qubell-ws-client/src/main/java/com/qubell/client/ws/*
+
+test/
