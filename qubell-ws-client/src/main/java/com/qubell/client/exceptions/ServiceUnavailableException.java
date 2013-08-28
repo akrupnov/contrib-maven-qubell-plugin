@@ -17,37 +17,37 @@
 package com.qubell.client.exceptions;
 
 /**
- * Thrown when user does not have enough privileges or requested API entity is not found
+ * Thrown when service is unavailable
  *
  * @author Alex Krupnov
  */
-public class ObjectNotFoundException extends QubellServiceException {
+public class ServiceUnavailableException extends QubellServiceException {
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message) {
+    public ServiceUnavailableException(String message) {
         super(message);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message, Throwable cause) {
+    public ServiceUnavailableException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(Throwable cause) {
+    public ServiceUnavailableException(Throwable cause) {
         super(cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ServiceUnavailableException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

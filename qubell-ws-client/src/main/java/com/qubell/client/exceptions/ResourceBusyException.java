@@ -17,37 +17,36 @@
 package com.qubell.client.exceptions;
 
 /**
- * Thrown when user does not have enough privileges or requested API entity is not found
+ * Thrown when resource, necessary for execution is busy
  *
  * @author Alex Krupnov
  */
-public class ObjectNotFoundException extends QubellServiceException {
-
+public class ResourceBusyException extends QubellServiceException {
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message) {
+    public ResourceBusyException(String message) {
         super(message);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message, Throwable cause) {
+    public ResourceBusyException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(Throwable cause) {
+    public ResourceBusyException(Throwable cause) {
         super(cause);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ObjectNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ResourceBusyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

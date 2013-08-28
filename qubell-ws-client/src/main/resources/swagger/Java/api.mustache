@@ -69,6 +69,10 @@ public class {{classname}} {
           throw new InsufficientPrivilegesException("API: {{nickname}} - User does not have enough privileges to execute the operation", ex);
       } else if(ex.getCode() == 404){
           throw new ObjectNotFoundException("API: {{nickname}} - Object was not found", ex);
+      } else if(ex.getCode() == 409){
+          throw new ResourceBusyException("API: {{nickname}} - Resource is busy", ex);
+      } else if(ex.getCode() == 500){
+          throw new ServiceUnavailableException("API: {{nickname}} - Service is unavailable", ex);
       }
 
       throw new QubellServiceException("API: {{nickname}} - Unknown service exception", ex);

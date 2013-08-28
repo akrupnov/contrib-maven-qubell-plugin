@@ -33,19 +33,23 @@ public class Configuration {
     private final Integer statusPollingInerval;
     private final Integer statusWaitTimeout;
     private final Boolean logApiPayload;
+    private final Integer retryTimeout;
+    private final Integer retryAttempts;
 
     /**
      * Initializes the config
      *
-     * @param apiURL            {@link #apiURL}
-     * @param apiUsername       {@link #apiUsername}
-     * @param apiPassword       {@link #apiPassword}
-     * @param bypassSSLCheck    {@link #bypassSSLCheck}
-     * @param pollingInterval   {@link #statusPollingInerval}
-     * @param statusWaitTimeout {@link #statusWaitTimeout}
-     * @param logApiPayload     {@link #logApiPayload}
+     * @param apiURL            {@link #getApiURL()}
+     * @param apiUsername       {@link #getApiUsername()}
+     * @param apiPassword       {@link #getApiPassword()}
+     * @param bypassSSLCheck    {@link #getBypassSSLCheck()}
+     * @param pollingInterval   {@link #getStatusPollingInterval()}
+     * @param statusWaitTimeout {@link #getStatusWaitTimeout()}
+     * @param logApiPayload     specifies whether API payload should be logged
+     * @param retryTimeout      {@link #getRetryTimeout()}
+     * @param retryAttempts     {@link #getRetryAttempts()}
      */
-    public Configuration(URL apiURL, String apiUsername, String apiPassword, Boolean bypassSSLCheck, Integer pollingInterval, Integer statusWaitTimeout, Boolean logApiPayload) {
+    public Configuration(URL apiURL, String apiUsername, String apiPassword, Boolean bypassSSLCheck, Integer pollingInterval, Integer statusWaitTimeout, Boolean logApiPayload, Integer retryTimeout, Integer retryAttempts) {
         this.apiURL = apiURL;
         this.apiUsername = apiUsername;
         this.apiPassword = apiPassword;
@@ -53,6 +57,8 @@ public class Configuration {
         this.statusPollingInerval = pollingInterval;
         this.statusWaitTimeout = statusWaitTimeout;
         this.logApiPayload = logApiPayload;
+        this.retryTimeout = retryTimeout;
+        this.retryAttempts = retryAttempts;
     }
 
     /**
@@ -104,5 +110,23 @@ public class Configuration {
      */
     public ClientConfiguration toApiClientConfiguration() {
         return new ClientConfiguration(apiURL.toString(), apiUsername, apiPassword, bypassSSLCheck, logApiPayload);
+    }
+
+    /**
+     * Number of attempts for retrying API call when service is busy or unavailable
+     *
+     * @return number of attempts
+     */
+    public Integer getRetryAttempts() {
+        return retryAttempts;
+    }
+
+    /**
+     * Timeout (in seconds) for retrying API call when service is busy or unavailable
+     *
+     * @return value of timeout
+     */
+    public Integer getRetryTimeout() {
+        return retryTimeout;
     }
 }

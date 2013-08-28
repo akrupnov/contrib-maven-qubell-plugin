@@ -19,6 +19,8 @@ package com.qubell.maven.plugin;
 
 import com.qubell.client.JsonParser;
 import com.qubell.client.exceptions.QubellServiceException;
+import com.qubell.client.exceptions.ResourceBusyException;
+import com.qubell.client.exceptions.ServiceUnavailableException;
 import com.qubell.client.ws.api.ApplicationsApi;
 import com.qubell.client.ws.api.InstancesApi;
 import com.qubell.client.ws.api.OrganizationsApi;
@@ -26,6 +28,8 @@ import com.qubell.client.ws.model.Instance;
 import com.qubell.client.ws.model.InstanceStatus;
 import com.qubell.client.ws.model.Workflow;
 import com.qubell.client.ws.model.WorkflowStep;
+import com.qubell.maven.plugin.commands.GetInstanceStatusCommand;
+import com.qubell.maven.plugin.commands.QubellApiCommand;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -39,6 +43,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Abstract base type for Qubell specific MOJOs
@@ -117,6 +122,18 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     @Parameter(required = false, defaultValue = "${project}")
     private MavenProject project;
 
+    /**
+     * Timeout (in seconds) for retrying API call when service is busy or unavailable
+     */
+    @Parameter(required = false, defaultValue = "10", property = "retryTimeout")
+    private Integer retryTimeout;
+
+    /**
+     * Number of attempts for retrying API call when service is busy or unavailable
+     */
+    @Parameter(required = false, defaultValue = "5", property = "retryAttempts")
+    private Integer retryAttempts;
+
     private String expectedStatus;
 
     /**
@@ -134,7 +151,7 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
      * @return a config object
      */
     protected Configuration getConfiguration() {
-        return new Configuration(apiURL, apiUsername, apiPassword, bypassSSLCheck, statusPollingInterval, statusWaitTimeout, logApiPayload);
+        return new Configuration(apiURL, apiUsername, apiPassword, bypassSSLCheck, statusPollingInterval, statusWaitTimeout, logApiPayload, retryTimeout, retryAttempts);
     }
 
     /**
@@ -204,7 +221,7 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     private InstanceStatus getInstanceStatus(Instance instance) throws MojoExecutionException {
         InstanceStatus status = null;
         try {
-            status = getInstancesApi().getInstanceStatusById(instance.getId());
+            status = runCommand(new GetInstanceStatusCommand(getInstancesApi(), instance.getId()));
         } catch (QubellServiceException e) {
             getLog().error("Unable to get instance status", e);
             throw new MojoExecutionException("Unable to get instance status", e);
@@ -283,7 +300,6 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
                 }
             }
         }
-
     }
 
     /**
@@ -344,5 +360,44 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
             customParams = new HashMap<String, Object>();
         }
         return customParams;
+    }
+
+    protected <TReturn, TCommand extends QubellApiCommand<TReturn>> TReturn runCommand(TCommand command) throws QubellServiceException, MojoExecutionException {
+        getLog().debug("Running command " + command);
+
+        Integer attempt = 0;
+        Configuration configuration = getConfiguration();
+
+        while (true) {
+
+            try {
+                attempt++;
+                return command.execute();
+            } catch (ServiceUnavailableException sae) {
+                getLog().error("Service is unavailable");
+                if (attempt >= configuration.getRetryAttempts()) {
+                    getLog().error("Failing after attempt #" + attempt);
+                    throw sae;
+                }
+            } catch (ResourceBusyException rbe) {
+                getLog().error("Resource is busy");
+                if (attempt >= configuration.getRetryAttempts()) {
+                    getLog().error("Failing after attempt #" + attempt);
+                    throw rbe;
+                }
+            }
+            Random r = new Random();
+            Integer waitPeriod = r.nextInt(configuration.getRetryTimeout()) + 1;
+
+            try {
+                logMessage("Waiting %s seconds until next retry", waitPeriod);
+                Thread.sleep(waitPeriod * 1000);
+            } catch (InterruptedException e) {
+                getLog().info("Wait interrupted");
+                throw new MojoExecutionException("Flow interrupted on status wait");
+            }
+
+            logMessage("Retrying");
+        }
     }
 }

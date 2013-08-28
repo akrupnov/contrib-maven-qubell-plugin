@@ -18,6 +18,7 @@ package com.qubell.maven.plugin;
 
 import com.qubell.client.exceptions.QubellServiceException;
 import com.qubell.client.ws.model.Instance;
+import com.qubell.maven.plugin.commands.RunWorkflowCommand;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -87,7 +88,8 @@ public class RunCommandMojo extends AbstractQubellMojo {
         Map<String, Object> customParams = parseCustomParameters();
 
         try {
-            Instance i = getInstancesApi().runWorkflow(targetInstanceId, getCommandName(), customParams);
+            Instance i = runCommand(new RunWorkflowCommand(getInstancesApi(), targetInstanceId, getCommandName(), customParams));
+
             waitForInstanceStatus(i);
             saveReturnValues(i);
         } catch (QubellServiceException e) {

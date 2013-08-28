@@ -19,6 +19,8 @@ package com.qubell.maven.plugin;
 import com.qubell.client.exceptions.QubellServiceException;
 import com.qubell.client.ws.model.Instance;
 import com.qubell.client.ws.model.InstanceSpecification;
+import com.qubell.maven.plugin.commands.LaunchInstanceCommand;
+import com.qubell.maven.plugin.commands.UpdateManifestCommand;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -113,7 +115,7 @@ public class LaunchInstanceMojo extends AbstractQubellMojo {
 
 
         try {
-            Instance i = getApplicationsApi().launchInstanceByAppId(applicationId, instanceSpecification);
+            Instance i = runCommand(new LaunchInstanceCommand(getApplicationsApi(), applicationId, instanceSpecification));
             logMessage("Launched instance %s", i.getId());
 
             return i;
@@ -128,7 +130,8 @@ public class LaunchInstanceMojo extends AbstractQubellMojo {
             String manifest = readManifest();
             getLog().debug("Manifest content: " + manifest);
             try {
-                Integer version = getApplicationsApi().updateManifest(applicationId, manifest, "application/x-yaml").getVersion();
+                Integer version = runCommand(new UpdateManifestCommand(getApplicationsApi(), applicationId, manifest));
+
                 logMessage("Updated manifest, new version is %s", version);
 
                 return version;
