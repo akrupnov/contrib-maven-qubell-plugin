@@ -171,13 +171,13 @@ mvn qubell:launch-instance -DapplicationId=5200df12e4b0758c3d25e2af
     Launches instance of Application, supplying all parameters from command line
 
 +------
-mvn qubell:launch-instance -DapplicationId=5200df12e4b0758c3d25e2af -DenvironmentId=5200ddb8e4b0758c3d25e295 -DapiURL=https://express.qubell.com/ -DapiUsername=user@name.com -DapiPassword=password -DbypassSSLCheck=true -DmanifestRelativePath=./sample/manifest.yaml -DoutputRelativePath=./out.json -DstatusPollingInterval=4 -DstatusWaitTimeout=90 -DdestroyInterval=900000 -Dparameters='{"some" : "Param"}'
+mvn qubell:launch-instance -DapplicationId=5200df12e4b0758c3d25e2af -DenvironmentId=5200ddb8e4b0758c3d25e295 -DapiURL=https://express.qubell.com/ -DapiUsername=user@name.com -DapiPassword=password -DbypassSSLCheck=true -DmanifestRelativePath=./sample/manifest.yaml -DoutputRelativePath=./out.json -DstatusPollingInterval=4 -DstatusWaitTimeout=90 -DdestroyInterval=900000 -DparametersJson='{"some" : "Param"}'
 +------
 
     Runs instance workflow returnStuff on instance 5219de34e4b0bf0bfe18605f with custom parameters
 
 +------
-mvn qubell:run-command -DinstanceId=5219de34e4b0bf0bfe18605f -Dname=returnstuff -Dparameters='{"some" : "Param"}' -DoutputRelativePath=./returnstuff.json
+mvn qubell:run-command -DinstanceId=5219de34e4b0bf0bfe18605f -Dname=returnstuff -DparametersJson='{"some" : "Param"}' -DoutputRelativePath=./returnstuff.json
 +------
 
     Same as above, ignoring optional parameters
