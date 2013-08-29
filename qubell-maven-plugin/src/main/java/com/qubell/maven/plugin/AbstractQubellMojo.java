@@ -54,16 +54,16 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     protected static final String INSTANCE_ID_KEY = "qubell.instance.id";
 
     /**
-     * Custom parameters for the execution, represents a raw JSON map
+     * Custom parametersJson for the execution, represents a raw JSON map
      * Example <code>{
      * "paramName" : "paramValue"
      * }</code>
      */
-    @Parameter(required = false, defaultValue = "{}", property = "parameters")
-    protected String parameters;
+    @Parameter(required = false, defaultValue = "{}", property = "parametersJson")
+    protected String parametersJson;
 
     /**
-     * Path for file where instance output parameters will be saved
+     * Path for file where instance output parametersJson will be saved
      */
     @Parameter(required = false, property = "outputRelativePath")
     protected String outputRelativePath;
@@ -349,14 +349,14 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     }
 
     /**
-     * Parses custom parameters field into map of string to object.
+     * Parses custom parametersJson field into map of string to object.
      *
      * @return parsed map or empty map
      */
     protected Map<String, Object> parseCustomParameters() {
-        Map<String, Object> customParams = JsonParser.parseMap(parameters);
+        Map<String, Object> customParams = JsonParser.parseMap(parametersJson);
         if (customParams == null) {
-            getLog().warn("Unable to parse custom parameters, ignoring. Values was:" + parameters);
+            getLog().warn("Unable to parse custom parameters json, ignoring. Values was:" + parametersJson);
             customParams = new HashMap<String, Object>();
         }
         return customParams;

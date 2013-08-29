@@ -129,7 +129,7 @@ public class RunCommandMojo extends AbstractQubellMojo {
                 instanceId,
                 tryGetInstanceId(),
                 name,
-                parameters)
+                parametersJson)
         );
     }
 

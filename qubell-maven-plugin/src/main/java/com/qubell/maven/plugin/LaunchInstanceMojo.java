@@ -176,7 +176,7 @@ public class LaunchInstanceMojo extends AbstractQubellMojo {
                 "Manifest relative path: %s, Output path %s, Destroy interval %s",
                 applicationId,
                 environmentId,
-                parameters,
+                parametersJson,
                 manifestRelativePath,
                 outputRelativePath,
                 destroyInterval
