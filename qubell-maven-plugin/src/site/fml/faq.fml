@@ -28,7 +28,7 @@ under the License.
     <faq id="account">
       <question>Can I use google account with Qubell plugin?</question>
       <answer>
-        <p>No, currently OAuth is not supported for API</p>
+        <p>No, currently OpenID is not supported for API</p>
       </answer>
     </faq>
     <faq id="ssl">

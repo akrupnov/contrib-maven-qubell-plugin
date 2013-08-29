@@ -70,7 +70,7 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
 
     /**
      * Username for API<br/>
-     * <b>Note:</b> cannot be OAuth username (such as Google account)
+     * <b>Note:</b> cannot be OpenID username (such as Google account)
      *
      * @required
      */
