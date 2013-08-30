@@ -99,11 +99,17 @@ mvn install:install-file -Dfile=${project.artifactId}-${project.version}.jar -Dv
               <statusPollingInterval>5</statusPollingInterval>
               <applicationId>5200df12e4b0758c3d25e2af</applicationId>
               <environmentId>5200ddb8e4b0758c3d25e295</environmentId>
-              <parameters>
+              <parametersJson><!-- Raw JSON parameter, overrides XML -->
                   {
                     "some" : "Param"
                   }
-              </parameters>
+              </parametersJson>
+              <parameters>
+                 <some>Param</some>
+                 <nested>
+                    <someNested>param</someNested>
+                 </nested>
+              </parameters
               <manifestRelativePath>./samplerepo/manifest.yaml</manifestRelativePath>
               <outputRelativePath>./path.json</outputRelativePath>
               <destroyInterval>900000</destroyInterval>
@@ -117,11 +123,6 @@ mvn install:install-file -Dfile=${project.artifactId}-${project.version}.jar -Dv
             </goals>
             <configuration>
               <name>returnstuff</name>
-              <parameters>
-                  {
-                    "somekey" : "true"
-                  }
-              </parameters>
               <outputRelativePath>./returnstuff.json</outputRelativePath>
             </configuration>
           </execution>
@@ -132,11 +133,6 @@ mvn install:install-file -Dfile=${project.artifactId}-${project.version}.jar -Dv
               <goal>destroy-instance</goal>
             </goals>
             <configuration>
-              <parameters>
-                  {
-                    "some" : "Param"
-                  }
-              </parameters>
               <statusPollingInterval>15</statusPollingInterval>
               <outputRelativePath>./destroy.json</outputRelativePath>
             </configuration>

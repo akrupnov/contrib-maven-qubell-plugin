@@ -85,7 +85,7 @@ public class RunCommandMojo extends AbstractQubellMojo {
         logMessage("Running command %s on instance %s", getCommandName(), targetInstanceId);
 
 
-        Map<String, Object> customParams = parseCustomParameters();
+        Map<String, Object> customParams = getCustomParameters();
 
         try {
             Instance i = runCommand(new RunWorkflowCommand(getInstancesApi(), targetInstanceId, getCommandName(), customParams));

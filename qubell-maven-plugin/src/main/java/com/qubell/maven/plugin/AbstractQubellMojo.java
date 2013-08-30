@@ -17,7 +17,7 @@
 package com.qubell.maven.plugin;
 
 
-import com.qubell.client.JsonParser;
+import com.qubell.client.ObjectParser;
 import com.qubell.client.exceptions.QubellServiceException;
 import com.qubell.client.exceptions.ResourceBusyException;
 import com.qubell.client.exceptions.ServiceUnavailableException;
@@ -33,10 +33,13 @@ import com.qubell.maven.plugin.commands.QubellApiCommand;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,6 +47,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Abstract base type for Qubell specific MOJOs
@@ -52,15 +56,28 @@ import java.util.Random;
  */
 public abstract class AbstractQubellMojo extends AbstractMojo {
     protected static final String INSTANCE_ID_KEY = "qubell.instance.id";
+    public static final String PARAMETERS_NAME = "parameters";
 
     /**
-     * Custom parametersJson for the execution, represents a raw JSON map
+     * Custom parameters for the execution, represents a raw JSON map. If supplied, overrides XML <code>parameters</code>
      * Example <code>{
      * "paramName" : "paramValue"
      * }</code>
      */
-    @Parameter(required = false, defaultValue = "{}", property = "parametersJson")
+    @Parameter(required = false, property = "parametersJson")
     protected String parametersJson;
+
+    /**
+     * Custom parameters in XML format
+     * Example <code>
+     * &lt;paramName&gt;paramValue&lt;/paramName&gt;
+     *     &lt;nestedParam&gt;
+     *     &lt;subKey&gt;subValue&lt;/subKey&gt;
+     * &lt;/nestedParam&gt;
+     * </code>
+     */
+    @Parameter(required = false, property = "parameters")
+    protected TreeMap<String, Object> parameters;
 
     /**
      * Path for file where instance output parametersJson will be saved
@@ -122,6 +139,15 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     @Parameter(required = false, defaultValue = "${project}")
     private MavenProject project;
 
+    @Parameter(required = false, defaultValue = "${session}")
+    private MavenSession session;
+
+    /**
+     * Current plugin MOJO execution information
+     */
+    @Parameter(required = false, defaultValue = "${mojoExecution}")
+    private MojoExecution mojoExecution;
+
     /**
      * Timeout (in seconds) for retrying API call when service is busy or unavailable
      */
@@ -168,6 +194,24 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
                 config.getApiURL().toString(),
                 config.getStatusPollingInterval().toString(),
                 config.getStatusWaitTimeout().toString()));
+
+    }
+
+    /**
+     * Manually parses configuration XML of {@link #parameters} and returns parsed map
+     * @return parsed map or null
+     */
+    private Map<String, Object> getXmlParameters() {
+        if (mojoExecution != null && mojoExecution.getConfiguration() != null) {
+            Xpp3Dom paramsDoc = mojoExecution.getConfiguration().getChild(PARAMETERS_NAME);
+
+            if (paramsDoc != null) {
+                getLog().debug("Custom XML params " + paramsDoc.toString());
+                return ObjectParser.parseXmlMap(paramsDoc.toString().replace(String.format("${%s}", PARAMETERS_NAME), ""));
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -274,12 +318,12 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
 
         if (returnValues != null && returnValues.size() > 0) {
             logMessage("Instance contains %d return values", returnValues.size());
-            logMessage("Return values dump: \n %s", JsonParser.serialize(returnValues));
+            logMessage("Return values dump: \n %s", ObjectParser.serializeToJson(returnValues));
 
             resultMap.put("returnValues", returnValues);
         }
 
-        String outputContents = JsonParser.serialize(resultMap);
+        String outputContents = ObjectParser.serializeToJson(resultMap);
         writeToFile(outputContents, outputRelativePath);
     }
 
@@ -349,15 +393,32 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     }
 
     /**
+     * Attempts to get XML parameters first, if not set attempts to parse json parameters, otherwise returns empty map
+     *
+     * @return parameters map or empty map
+     */
+    protected Map<String, Object> getCustomParameters() {
+        Map<String, Object> returnValue = getJsonParameters();
+        if (returnValue == null) {
+            returnValue =  getXmlParameters();
+        }
+
+        if (returnValue == null) {
+            returnValue = new HashMap<String, Object>();
+        }
+
+        return returnValue;
+    }
+
+    /**
      * Parses custom parametersJson field into map of string to object.
      *
-     * @return parsed map or empty map
+     * @return parsed map or null
      */
-    protected Map<String, Object> parseCustomParameters() {
-        Map<String, Object> customParams = JsonParser.parseMap(parametersJson);
+    private Map<String, Object> getJsonParameters() {
+        Map<String, Object> customParams = ObjectParser.parseJsonMap(parametersJson);
         if (customParams == null) {
             getLog().warn("Unable to parse custom parameters json, ignoring. Values was:" + parametersJson);
-            customParams = new HashMap<String, Object>();
         }
         return customParams;
     }
@@ -398,6 +459,7 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
             }
 
             logMessage("Retrying");
+
         }
     }
 }

@@ -19,24 +19,33 @@ package com.qubell.client;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.xml.XmlMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Simple json parser
+ * Simple json/xml parser
  *
  * @author Alex Krupnov
  */
-public class JsonParser {
+public class ObjectParser {
+    public static Map<String, Object> parseXmlMap(String value) {
+        XmlMapper mapper = new XmlMapper();
+        try {
+            return mapper.readValue(value, Map.class);
+        } catch (IOException e) {
+            return null;
+        }
+    }
     /**
      * Parses a key value pair map from simple json expression
      *
      * @param value string representation of json object
      * @return parsed value or null for invalid input
      */
-    public static Map<String, Object> parseMap(String value) {
+    public static Map<String, Object> parseJsonMap(String value) {
         JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper(factory);
         TypeReference<HashMap<String, Object>> typeRef
@@ -48,7 +57,7 @@ public class JsonParser {
 
         try {
             parsedMap
-                    = mapper.readValue(value, typeRef);
+                    = mapper.readValue(value == null ? "" : value, typeRef);
 
             return parsedMap;
         } catch (IOException e) {
@@ -62,7 +71,7 @@ public class JsonParser {
      * @param obj object to be serialized to string
      * @return string json
      */
-    public static String serialize(Object obj) {
+    public static String serializeToJson(Object obj) {
         JsonFactory factory = new JsonFactory();
         ObjectMapper mapper = new ObjectMapper(factory);
 

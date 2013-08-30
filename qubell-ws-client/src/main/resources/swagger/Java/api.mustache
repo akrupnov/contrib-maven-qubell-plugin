@@ -71,7 +71,7 @@ public class {{classname}} {
           throw new ObjectNotFoundException("API: {{nickname}} - Object was not found", ex);
       } else if(ex.getCode() == 409){
           throw new ResourceBusyException("API: {{nickname}} - Resource is busy", ex);
-      } else if(ex.getCode() == 500){
+      } else if(ex.getCode() >= 500){
           throw new ServiceUnavailableException("API: {{nickname}} - Service is unavailable", ex);
       }
 

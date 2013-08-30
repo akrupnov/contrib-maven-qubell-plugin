@@ -104,7 +104,7 @@ public class LaunchInstanceMojo extends AbstractQubellMojo {
     private Instance launchInstance(int version) throws MojoExecutionException {
         InstanceSpecification instanceSpecification = new InstanceSpecification();
         instanceSpecification.setDestroyInterval(destroyInterval);
-        instanceSpecification.setParameters(parseCustomParameters());
+        instanceSpecification.setParameters(getCustomParameters());
 
         if (version > 0) {
             instanceSpecification.setVersion(version);
