@@ -39,15 +39,14 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Abstract base type for Qubell specific MOJOs
@@ -88,18 +87,18 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     /**
      * Username for API<br/>
      * <b>Note:</b> cannot be OpenID username (such as Google account)
+     * This value gets overridden if qubell.global.server pointing to valid server entry in global/user settings
      *
-     * @required
      */
-    @Parameter(required = true, property = "apiUsername")
+    @Parameter(required = false, property = "apiUsername")
     private String apiUsername;
 
     /**
      * API password
-     *
+     * This value gets overridden if qubell.global.server pointing to valid server entry in global/user settings
      * @required
      */
-    @Parameter(required = true, property = "apiPassword")
+    @Parameter(required = false, property = "apiPassword")
     private String apiPassword;
 
     /**
@@ -163,6 +162,15 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
     private String expectedStatus;
 
     /**
+     * Maven settings
+     */
+    @Parameter(required = false, defaultValue = "${settings}")
+    private Settings settings;
+
+    @Parameter(required = false, defaultValue = "${qubell.global.server}")
+    private String serverId;
+
+    /**
      * Initializes instance with expected status
      *
      * @param expectedStatus status which is expected for successful MOJO execution
@@ -177,7 +185,15 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
      * @return a config object
      */
     protected Configuration getConfiguration() {
-        return new Configuration(apiURL, apiUsername, apiPassword, bypassSSLCheck, statusPollingInterval, statusWaitTimeout, logApiPayload, retryTimeout, retryAttempts);
+        getLog().debug("Trying to get global server settings for  id " + serverId);
+
+        Server server = getServer();
+        if(server == null){
+            getLog().debug("No server configuration found");
+            return new Configuration(apiURL, apiUsername, apiPassword, bypassSSLCheck, statusPollingInterval, statusWaitTimeout, logApiPayload, retryTimeout, retryAttempts);
+        }
+
+        return new Configuration(apiURL, server.getUsername(), server.getPassword(), bypassSSLCheck, statusPollingInterval, statusWaitTimeout, logApiPayload, retryTimeout, retryAttempts);
     }
 
     /**
@@ -461,5 +477,25 @@ public abstract class AbstractQubellMojo extends AbstractMojo {
             logMessage("Retrying");
 
         }
+    }
+
+    /**
+     * Get server with given id
+     *
+     * @return server or null if none matching
+     */
+    protected Server getServer() {
+
+        if (settings == null || StringUtils.isEmpty(serverId))
+            return null;
+
+        List<Server> servers = settings.getServers();
+        if (servers == null || servers.isEmpty())
+            return null;
+
+        for (Server server : servers)
+            if (serverId.equals(server.getId()))
+                return server;
+        return null;
     }
 }

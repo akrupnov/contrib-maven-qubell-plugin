@@ -153,6 +153,37 @@ mvn install:install-file -Dfile=${project.artifactId}-${project.version}.jar -Dv
 mvn install
 +------
 
+* Credentials configuration
+
+    There are two ways of configuring your Qubell credentials for maven plugin.
+    First is to put username and password directly into your project pom file as shown above.
+
+    Alternatively you can configure a qubell server instnace in your global or user specific Maven settings XML as following:
+
++------
+         ....
+          <servers>
+          ....
+            <server>
+              <id>qubellexpress</id>
+              <username>username</username>
+              <password>password</password>
+            </server>
+        ...
++------
+  and then reference this in your project as a property
+
++------
+  <properties>
+   ...
+    <qubell.global.server>qubellexpress</qubell.global.server>
+   ...
+  </properties>
++------
+
+   Please note, that server address itself should be placed in the project pom file in both cases.
+
+
 * Running in standalone mode
 
     Qubell plugin goals can be executed manually when plugin is defined in your pom file
