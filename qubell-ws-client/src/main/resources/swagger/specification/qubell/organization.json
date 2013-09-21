@@ -131,25 +131,6 @@
                 "name": {
                     "type": "string",
                     "description": "Application name"
-                },
-                "isBasicLaunchAllowed": {
-                    "type": "boolean",
-                    "description": "Whether basic launch is allowed for app"
-                },
-                "activeInstancesCount": {
-                    "type": "int",
-                    "format": "int32",
-                    "description": "Number of currently active instances"
-                },
-                "environments": {
-                    "type": "Array",
-                    "items": {
-                        "$ref": "Environment"
-                    }
-                },
-                "manifest": {
-                    "type": "Manifest",
-                    "description": "Application manifest"
                 }
             }
         },
